@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Futbol Stats",
+  title: "Fuchibol",
   description: "Registra partidos y estadísticas de tu grupo de fútbol",
   icons: [
     { rel: "apple-touch-icon", url: "/icon-192x192.png" },

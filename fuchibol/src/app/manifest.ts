@@ -2,8 +2,8 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Futbol Stats",
-    short_name: "Futbol Stats",
+    name: "Fuchibol",
+    short_name: "Fuchibol",
     description: "Registra partidos y estadísticas de tu grupo de fútbol",
     start_url: "/",
     display: "standalone",

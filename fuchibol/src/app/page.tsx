@@ -14,7 +14,7 @@ export default async function DashboardPage() {
     <div className="min-h-screen p-4">
       <header className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Futbol Stats</h1>
+          <h1 className="text-2xl font-bold">Fuchibol</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
               {session.user?.name}
