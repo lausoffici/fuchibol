@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { CreateMatchDialog } from "@/components/matches/create-match-dialog";
 import { GroupWithDetails } from "@/types";
+import { AddPlayerDialog } from "../players/add-player-dialog";
 
 function getSkillColor(skill: number) {
   if (skill >= 7) return "bg-emerald-500/20 text-emerald-700";
@@ -16,6 +17,7 @@ function getSkillColor(skill: number) {
 
 export function GroupDetail({ group }: { group: GroupWithDetails }) {
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
+  const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
   const averageSkill =
     group.players.reduce((sum, player) => sum + player.skill, 0) /
     group.players.length;
@@ -25,24 +27,28 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold">{group.name}</h1>
-          <div className="flex items-center mt-2 text-muted-foreground gap-4">
-            <div className="flex items-center">
-              <Users className="h-4 w-4 mr-1" />
+          <div className="flex items-center mt-2 gap-6">
+            <div className="flex items-center text-muted-foreground">
+              <Users className="h-4 w-4 mr-1.5" />
               <span>{group._count.players} jugadores</span>
             </div>
-            <div className="flex items-center">
-              <Trophy className="h-4 w-4 mr-1" />
+            <div className="flex items-center text-muted-foreground">
+              <Trophy className="h-4 w-4 mr-1.5" />
               <span>{group._count.matches} partidos</span>
             </div>
+            {averageSkill && (
+              <div className="flex items-center text-muted-foreground">
+                <span>Nivel promedio: {averageSkill.toFixed(1)}</span>
+              </div>
+            )}
           </div>
-          {averageSkill && (
-            <div className="ml-4">
-              Nivel promedio: {averageSkill.toFixed(1)}
-            </div>
-          )}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPlayerDialogOpen(true)}
+          >
             <Plus className="h-4 w-4 mr-1" />
             Agregar jugador
           </Button>
@@ -101,7 +107,10 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">Últimos partidos</CardTitle>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-amber-500" />
+              Últimos partidos
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {(group.matches?.length ?? 0) > 0 ? (
@@ -116,8 +125,11 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                         {new Date(match.date).toLocaleDateString()}
                       </span>
                       <span className="font-medium">
-                        Diferencia: {match.scoreDiff}{" "}
-                        {match.scoreDiff === 1 ? "gol" : "goles"}
+                        {match.winningTeam === null
+                          ? "Empate"
+                          : `${match.scoreDiff} ${
+                              match.scoreDiff === 1 ? "gol" : "goles"
+                            } de diferencia`}
                       </span>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
@@ -125,11 +137,27 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                         className={cn(
                           "space-y-2 p-3 rounded-lg",
                           match.winningTeam === "A"
-                            ? "bg-emerald-50"
+                            ? "bg-emerald-100 border-2 border-emerald-300 shadow-sm"
+                            : match.winningTeam === null
+                            ? "bg-amber-50 border-2 border-amber-200"
                             : "bg-muted/50"
                         )}
                       >
-                        <h4 className="font-medium">Equipo A</h4>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium flex items-center gap-2">
+                            Equipo A {match.winningTeam === "A" && "🏆"}
+                            {match.winningTeam === null && "🤝"}
+                          </h4>
+                          <span className="text-sm text-muted-foreground">
+                            Nivel:{" "}
+                            {(
+                              match.teamAPlayers.reduce(
+                                (sum, p) => sum + p.skill,
+                                0
+                              ) / match.teamAPlayers.length
+                            ).toFixed(1)}
+                          </span>
+                        </div>
                         <div className="space-y-1">
                           {match.teamAPlayers.map((player) => (
                             <div key={player.id} className="text-sm">
@@ -142,11 +170,27 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                         className={cn(
                           "space-y-2 p-3 rounded-lg",
                           match.winningTeam === "B"
-                            ? "bg-emerald-50"
+                            ? "bg-emerald-100 border-2 border-emerald-300 shadow-sm"
+                            : match.winningTeam === null
+                            ? "bg-amber-50 border-2 border-amber-200"
                             : "bg-muted/50"
                         )}
                       >
-                        <h4 className="font-medium">Equipo B</h4>
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium flex items-center gap-2">
+                            Equipo B {match.winningTeam === "B" && "🏆"}
+                            {match.winningTeam === null && "🤝"}
+                          </h4>
+                          <span className="text-sm text-muted-foreground">
+                            Nivel:{" "}
+                            {(
+                              match.teamBPlayers.reduce(
+                                (sum, p) => sum + p.skill,
+                                0
+                              ) / match.teamBPlayers.length
+                            ).toFixed(1)}
+                          </span>
+                        </div>
                         <div className="space-y-1">
                           {match.teamBPlayers.map((player) => (
                             <div key={player.id} className="text-sm">
@@ -168,6 +212,11 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
         </Card>
       </div>
 
+      <AddPlayerDialog
+        groupId={group.id}
+        open={playerDialogOpen}
+        onOpenChange={setPlayerDialogOpen}
+      />
       <CreateMatchDialog
         groupId={group.id}
         players={group.players}

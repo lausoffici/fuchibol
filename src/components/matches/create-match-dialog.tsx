@@ -100,7 +100,8 @@ export function CreateMatchDialog({
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar jugador">
-                    {getPlayerName(teamA[index])}
+                    {players.find((p) => p.id === teamA[index])?.name ||
+                      "Seleccionar jugador"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -134,7 +135,8 @@ export function CreateMatchDialog({
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar jugador">
-                    {getPlayerName(teamB[index])}
+                    {players.find((p) => p.id === teamB[index])?.name ||
+                      "Seleccionar jugador"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -164,7 +166,15 @@ export function CreateMatchDialog({
                 onValueChange={(value: "A" | "B" | "DRAW") => setWinner(value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar resultado" />
+                  <SelectValue placeholder="Seleccionar resultado">
+                    {winner === "A"
+                      ? "Ganó Equipo A"
+                      : winner === "B"
+                      ? "Ganó Equipo B"
+                      : winner === "DRAW"
+                      ? "Empate"
+                      : "Seleccionar resultado"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="A">Ganó Equipo A</SelectItem>
@@ -179,7 +189,13 @@ export function CreateMatchDialog({
                 <h3 className="text-sm font-medium">Diferencia de goles</h3>
                 <Select value={scoreDiff} onValueChange={setScoreDiff}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar diferencia" />
+                    <SelectValue placeholder="Seleccionar diferencia">
+                      {scoreDiff
+                        ? `${scoreDiff} ${
+                            parseInt(scoreDiff) === 1 ? "gol" : "goles"
+                          }`
+                        : "Seleccionar diferencia"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (

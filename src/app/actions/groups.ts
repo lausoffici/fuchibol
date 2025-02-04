@@ -142,3 +142,28 @@ export async function getGroupById(
     },
   };
 }
+
+interface AddPlayerInput {
+  groupId: string;
+  name: string;
+  skill: number;
+}
+
+export async function addPlayerToGroup(input: AddPlayerInput) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    throw new Error("No autorizado");
+  }
+
+  const player = await prisma.player.create({
+    data: {
+      name: input.name,
+      skill: input.skill,
+      groupId: input.groupId,
+    },
+  });
+
+  revalidatePath(`/groups/${input.groupId}`);
+  return player;
+}
