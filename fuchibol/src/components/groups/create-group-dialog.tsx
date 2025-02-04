@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { PlayerInput } from "@/components/groups/player-input";
+import { createGroup } from "@/app/actions/groups";
+import { useToast } from "@/hooks/use-toast";
 
 interface Player {
   name: string;
@@ -26,6 +28,8 @@ export function CreateGroupDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [players, setPlayers] = useState<Player[]>([
     { name: "", skill: 5 },
@@ -44,9 +48,29 @@ export function CreateGroupDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implementar la creación del grupo
-    console.log({ groupName, players });
-    onOpenChange(false);
+    setLoading(true);
+
+    try {
+      await createGroup({
+        name: groupName,
+        players: players.filter((p) => p.name.trim() !== ""),
+      });
+
+      toast({
+        title: "Grupo creado",
+        description: "El grupo se ha creado correctamente",
+      });
+
+      onOpenChange(false);
+    } catch {
+      toast({
+        title: "Error",
+        description: "No se pudo crear el grupo",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -68,6 +92,7 @@ export function CreateGroupDialog({
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 placeholder="ej. Fútbol de los jueves"
+                disabled={loading}
               />
             </div>
 
@@ -85,6 +110,7 @@ export function CreateGroupDialog({
                 variant="outline"
                 className="w-full"
                 onClick={handleAddPlayer}
+                disabled={loading}
               >
                 Agregar jugador
               </Button>
@@ -96,10 +122,13 @@ export function CreateGroupDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
+              disabled={loading}
             >
               Cancelar
             </Button>
-            <Button type="submit">Crear grupo</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Creando..." : "Crear grupo"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
