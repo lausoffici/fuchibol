@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { revalidatePath } from "next/cache";
+import { GroupWithDetails } from "@/types";
 
 interface CreateGroupInput {
   name: string;
@@ -91,7 +92,9 @@ export async function getUserGroups() {
   return groups;
 }
 
-export async function getGroupById(id: string) {
+export async function getGroupById(
+  id: string
+): Promise<GroupWithDetails | null> {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {

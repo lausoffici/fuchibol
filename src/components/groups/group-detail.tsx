@@ -6,25 +6,7 @@ import { Users, Plus, Settings2, Trophy, Swords } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { CreateMatchDialog } from "@/components/matches/create-match-dialog";
-import { Player } from "@prisma/client";
-
-interface Group {
-  id: string;
-  name: string;
-  players: Player[];
-  _count: {
-    players: number;
-    matches: number;
-  };
-  matches?: {
-    id: string;
-    date: string;
-    scoreDiff: number;
-    winningTeam: string;
-    teamAPlayers: Player[];
-    teamBPlayers: Player[];
-  }[];
-}
+import { GroupWithDetails } from "@/types";
 
 function getSkillColor(skill: number) {
   if (skill >= 7) return "bg-emerald-500/20 text-emerald-700";
@@ -32,7 +14,7 @@ function getSkillColor(skill: number) {
   return "bg-red-500/20 text-red-700";
 }
 
-export function GroupDetail({ group }: { group: Group }) {
+export function GroupDetail({ group }: { group: GroupWithDetails }) {
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const averageSkill =
     group.players.reduce((sum, player) => sum + player.skill, 0) /
