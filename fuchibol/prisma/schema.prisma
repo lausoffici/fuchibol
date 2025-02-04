@@ -28,16 +28,32 @@ model Group {
     ownerId   String
     members   User[]   @relation("GroupMembers")
     players   Player[]
+    matches   Match[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model Player {
-    id        String   @id @default(cuid())
-    name      String
-    skill     Int      @default(5)
-    group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
-    groupId   String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id           String   @id @default(cuid())
+    name         String
+    skill        Int      @default(5)
+    group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    groupId      String
+    matchesTeamA Match[]  @relation("TeamAPlayers")
+    matchesTeamB Match[]  @relation("TeamBPlayers")
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model Match {
+    id           String   @id @default(cuid())
+    date         DateTime @default(now())
+    group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    groupId      String
+    teamAPlayers Player[] @relation("TeamAPlayers")
+    teamBPlayers Player[] @relation("TeamBPlayers")
+    winningTeam  String?
+    scoreDiff    Int?
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
 }
