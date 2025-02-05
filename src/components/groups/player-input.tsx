@@ -15,11 +15,13 @@ interface PlayerInputProps {
     skill: number;
   };
   onChange: (value: { name: string; skill: number }) => void;
+  loading?: boolean;
 }
 
 export function PlayerInput({
   value = { name: "", skill: 5 },
   onChange,
+  loading,
 }: PlayerInputProps) {
   return (
     <div className="flex gap-2 w-full">
@@ -32,6 +34,7 @@ export function PlayerInput({
             name: e.target.value,
           })
         }
+        disabled={loading}
       />
       <Select
         value={value.skill.toString()}
@@ -41,6 +44,7 @@ export function PlayerInput({
             skill: parseInt(newValue),
           })
         }
+        disabled={loading}
       >
         <SelectTrigger className="w-[100px]">
           <SelectValue placeholder="Nivel" />

@@ -11,6 +11,7 @@ export type GroupWithDetails = Group & {
   matches: (Match & {
     teamAPlayers: Player[];
     teamBPlayers: Player[];
+    mvp: Player | null;
   })[];
   _count: {
     players: number;

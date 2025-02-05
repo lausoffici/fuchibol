@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { redirect } from "next/navigation";
-import { getGroupById } from "@/app/actions/groups";
+import { getGroup } from "@/app/actions/groups";
 import { GroupDetail } from "@/components/groups/group-detail";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -16,7 +16,7 @@ export default async function GroupPage({ params }: PageProps<{ id: string }>) {
     redirect("/login");
   }
 
-  const group = await getGroupById(id);
+  const group = await getGroup(id);
 
   if (!group) {
     redirect("/");

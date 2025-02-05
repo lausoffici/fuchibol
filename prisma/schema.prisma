@@ -41,6 +41,7 @@ model Player {
     groupId      String
     matchesTeamA Match[]  @relation("TeamAPlayers")
     matchesTeamB Match[]  @relation("TeamBPlayers")
+    mvpMatches   Match[]  @relation("MVP")
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 }
@@ -54,6 +55,10 @@ model Match {
     teamBPlayers Player[] @relation("TeamBPlayers")
     winningTeam  String?
     scoreDiff    Int?     @default(0)
+    mvp          Player?  @relation("MVP", fields: [mvpId], references: [id])
+    mvpId        String?
+    teamAScore   Int?
+    teamBScore   Int?
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 }

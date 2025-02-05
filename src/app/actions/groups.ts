@@ -4,7 +4,6 @@ import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { revalidatePath } from "next/cache";
-import { GroupWithDetails } from "@/types";
 
 interface CreateGroupInput {
   name: string;
@@ -92,55 +91,31 @@ export async function getUserGroups() {
   return groups;
 }
 
-export async function getGroupById(
-  id: string
-): Promise<GroupWithDetails | null> {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.email) {
-    throw new Error("No autorizado");
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    throw new Error("Usuario no encontrado");
-  }
-
+export async function getGroup(id: string) {
   const group = await prisma.group.findUnique({
-    where: {
-      id,
-      ownerId: user.id,
-    },
+    where: { id },
     include: {
-      players: {
-        orderBy: {
-          skill: "desc",
-        },
-      },
+      players: true,
       matches: {
         include: {
           teamAPlayers: true,
           teamBPlayers: true,
+          mvp: true,
         },
         orderBy: {
           date: "desc",
         },
       },
+      _count: {
+        select: {
+          players: true,
+          matches: true,
+        },
+      },
     },
   });
 
-  if (!group) return null;
-
-  return {
-    ...group,
-    _count: {
-      players: group.players.length,
-      matches: group.matches.length,
-    },
-  };
+  return group;
 }
 
 interface AddPlayerInput {

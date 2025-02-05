@@ -15,6 +15,19 @@ function getSkillColor(skill: number) {
   return "bg-red-500/20 text-red-700";
 }
 
+// Función helper para formatear la fecha
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("es-AR", {
+    day: "numeric",
+    month: "short",
+    weekday: "long",
+    year: "numeric",
+  })
+    .format(date)
+    .replace(".", "")
+    .toLowerCase();
+}
+
 export function GroupDetail({ group }: { group: GroupWithDetails }) {
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
@@ -38,7 +51,9 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
             </div>
             {averageSkill && (
               <div className="flex items-center text-muted-foreground">
-                <span>Nivel promedio: {averageSkill.toFixed(1)}</span>
+                <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">
+                  Nivel promedio: {averageSkill.toFixed(1)}
+                </span>
               </div>
             )}
           </div>
@@ -78,7 +93,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                 {group.players.map((player) => (
                   <div
                     key={player.id}
-                    className="flex items-center justify-between rounded-lg border px-4 py-3"
+                    className="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-muted/50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
@@ -121,11 +136,13 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                     className="rounded-lg border p-4 space-y-3"
                   >
                     <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">
-                        {new Date(match.date).toLocaleDateString()}
+                      <span className="text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full text-xs">
+                        {formatDate(new Date(match.date))}
                       </span>
                       <span className="font-medium">
-                        {match.winningTeam === null
+                        {match.teamAScore !== null && match.teamBScore !== null
+                          ? `${match.teamAScore} - ${match.teamBScore}`
+                          : match.winningTeam === null
                           ? "Empate"
                           : `${match.scoreDiff} ${
                               match.scoreDiff === 1 ? "gol" : "goles"
@@ -145,10 +162,13 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                       >
                         <div className="flex items-center justify-between">
                           <h4 className="font-medium flex items-center gap-2">
-                            Equipo A {match.winningTeam === "A" && "🏆"}
-                            {match.winningTeam === null && "🤝"}
+                            Equipo A{" "}
+                            <span className="text-xs text-muted-foreground">
+                              ({match.teamAPlayers.length})
+                            </span>
+                            {match.winningTeam === "A" && "🏆"}
                           </h4>
-                          <span className="text-sm text-muted-foreground">
+                          <span className="text-sm bg-muted/30 px-2 py-0.5 rounded-full">
                             Nivel:{" "}
                             {(
                               match.teamAPlayers.reduce(
@@ -160,8 +180,23 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                         </div>
                         <div className="space-y-1">
                           {match.teamAPlayers.map((player) => (
-                            <div key={player.id} className="text-sm">
+                            <div
+                              key={player.id}
+                              className={cn(
+                                "text-sm flex items-center gap-1.5",
+                                match.mvp?.id === player.id &&
+                                  "font-medium text-amber-600"
+                              )}
+                            >
                               {player.name}
+                              {match.mvp?.id === player.id && (
+                                <span className="flex items-center gap-1 text-amber-400">
+                                  <span className="text-[10px] uppercase font-bold tracking-wider">
+                                    MVP
+                                  </span>
+                                  👑
+                                </span>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -193,8 +228,23 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                         </div>
                         <div className="space-y-1">
                           {match.teamBPlayers.map((player) => (
-                            <div key={player.id} className="text-sm">
+                            <div
+                              key={player.id}
+                              className={cn(
+                                "text-sm flex items-center gap-1.5",
+                                match.mvp?.id === player.id &&
+                                  "font-medium text-amber-600"
+                              )}
+                            >
                               {player.name}
+                              {match.mvp?.id === player.id && (
+                                <span className="flex items-center gap-1 text-amber-400">
+                                  <span className="text-[10px] uppercase font-bold tracking-wider">
+                                    MVP
+                                  </span>
+                                  👑
+                                </span>
+                              )}
                             </div>
                           ))}
                         </div>

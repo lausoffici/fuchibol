@@ -101,8 +101,9 @@ export function CreateGroupDialog({
               {players.map((player, index) => (
                 <PlayerInput
                   key={index}
-                  player={player}
+                  value={player}
                   onChange={(player) => handlePlayerChange(index, player)}
+                  loading={loading}
                 />
               ))}
               <Button

@@ -15,6 +15,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { createMatch } from "@/app/actions/matches";
 import { useToast } from "@/hooks/use-toast";
@@ -39,13 +46,18 @@ export function CreateMatchDialog({
   const [teamB, setTeamB] = useState<string[]>(Array(5).fill(""));
   const [winner, setWinner] = useState<"A" | "B" | "DRAW" | "">("");
   const [scoreDiff, setScoreDiff] = useState<string>("1");
+  const [mvp, setMvp] = useState<string>("");
 
   const availablePlayers = players.filter(
     (p) => !teamA.includes(p.id) && !teamB.includes(p.id)
   );
 
-  const getPlayerName = (playerId: string) => {
-    return players.find((p) => p.id === playerId)?.name;
+  const resetForm = () => {
+    setTeamA(Array(5).fill(""));
+    setTeamB(Array(5).fill(""));
+    setWinner("");
+    setScoreDiff("1");
+    setMvp("");
   };
 
   const handleSubmit = async () => {
@@ -59,6 +71,7 @@ export function CreateMatchDialog({
         teamB: teamB.filter(Boolean),
         winner,
         scoreDiff: parseInt(scoreDiff),
+        mvpId: mvp || undefined,
       });
 
       toast({
@@ -66,6 +79,7 @@ export function CreateMatchDialog({
         description: "El partido se ha registrado correctamente",
       });
 
+      resetForm();
       onOpenChange(false);
     } catch {
       toast({
@@ -158,22 +172,24 @@ export function CreateMatchDialog({
         </div>
 
         <div className="space-y-4 pt-4 border-t">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Resultado</h3>
               <Select
                 value={winner}
-                onValueChange={(value: "A" | "B" | "DRAW") => setWinner(value)}
+                onValueChange={(value: "A" | "B" | "DRAW") => {
+                  setWinner(value);
+                }}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar resultado">
+                  <SelectValue placeholder="Seleccionar ganador">
                     {winner === "A"
                       ? "Ganó Equipo A"
                       : winner === "B"
                       ? "Ganó Equipo B"
                       : winner === "DRAW"
                       ? "Empate"
-                      : "Seleccionar resultado"}
+                      : "Seleccionar ganador"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -184,25 +200,77 @@ export function CreateMatchDialog({
               </Select>
             </div>
 
-            {winner !== "DRAW" && (
+            {winner && (
               <div className="space-y-2">
-                <h3 className="text-sm font-medium">Diferencia de goles</h3>
-                <Select value={scoreDiff} onValueChange={setScoreDiff}>
+                {winner !== "DRAW" && (
+                  <>
+                    <h3 className="text-sm font-medium">Diferencia de goles</h3>
+                    <Select value={scoreDiff} onValueChange={setScoreDiff}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar diferencia">
+                          {scoreDiff
+                            ? `${scoreDiff} ${
+                                parseInt(scoreDiff) === 1 ? "gol" : "goles"
+                              }`
+                            : "Seleccionar diferencia"}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                          <SelectItem key={n} value={n.toString()}>
+                            {n} {n === 1 ? "gol" : "goles"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </>
+                )}
+              </div>
+            )}
+
+            {winner && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-medium">MVP (opcional)</h3>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="text-muted-foreground">
+                        <HelpCircle className="h-4 w-4" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-[250px]">
+                        <p>
+                          Most Valuable Player (MVP) - Jugador que tuvo el mejor
+                          rendimiento o mayor impacto en el partido, ya sea por
+                          goles, asistencias o juego en general.
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+                <Select value={mvp} onValueChange={setMvp}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar diferencia">
-                      {scoreDiff
-                        ? `${scoreDiff} ${
-                            parseInt(scoreDiff) === 1 ? "gol" : "goles"
-                          }`
-                        : "Seleccionar diferencia"}
+                    <SelectValue placeholder="Seleccionar jugador">
+                      {players.find((p) => p.id === mvp)?.name}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                      <SelectItem key={n} value={n.toString()}>
-                        {n} {n === 1 ? "gol" : "goles"}
-                      </SelectItem>
-                    ))}
+                    {[...teamA, ...teamB].filter(Boolean).length > 0 ? (
+                      [...teamA, ...teamB].filter(Boolean).map((playerId) => {
+                        const player = players.find((p) => p.id === playerId);
+                        if (!player) return null;
+
+                        const team = teamA.includes(playerId) ? "A" : "B";
+                        return (
+                          <SelectItem key={player.id} value={player.id}>
+                            {player.name} (Equipo {team})
+                          </SelectItem>
+                        );
+                      })
+                    ) : (
+                      <div className="relative flex items-center justify-center py-6 text-sm text-muted-foreground">
+                        Selecciona jugadores en los equipos
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

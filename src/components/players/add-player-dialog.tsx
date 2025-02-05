@@ -13,12 +13,6 @@ import { addPlayerToGroup } from "@/app/actions/groups";
 import { PlayerInput } from "@/components/groups/player-input";
 import { Plus, Trash2 } from "lucide-react";
 
-interface Player {
-  id: string;
-  name: string;
-  skill: number;
-}
-
 interface AddPlayerDialogProps {
   groupId: string;
   open: boolean;
@@ -85,6 +79,7 @@ export function AddPlayerDialog({
                   newPlayers[index] = value;
                   setPlayers(newPlayers);
                 }}
+                loading={loading}
               />
               {players.length > 1 && (
                 <Button
