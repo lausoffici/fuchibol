@@ -1,62 +1,61 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider  = "postgresql"
-    url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-    directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 model User {
-    id        String   @id @default(cuid())
-    email     String   @unique
-    name      String?
-    groups    Group[]  @relation("GroupMembers")
-    ownGroups Group[]
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ownGroups Group[]
+  groups    Group[]  @relation("GroupMembers")
 }
 
 model Group {
-    id        String   @id @default(cuid())
-    name      String
-    owner     User     @relation(fields: [ownerId], references: [id])
-    ownerId   String
-    members   User[]   @relation("GroupMembers")
-    players   Player[]
-    matches   Match[]
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  owner     User     @relation(fields: [ownerId], references: [id])
+  matches   Match[]
+  players   Player[]
+  members   User[]   @relation("GroupMembers")
 }
 
 model Player {
-    id           String   @id @default(cuid())
-    name         String
-    skill        Int      @default(5)
-    group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
-    groupId      String
-    matchesTeamA Match[]  @relation("TeamAPlayers")
-    matchesTeamB Match[]  @relation("TeamBPlayers")
-    mvpMatches   Match[]  @relation("MVP")
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
+  id           String   @id @default(cuid())
+  name         String
+  skill        Int      @default(5)
+  groupId      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  mvpMatches   Match[]  @relation("MVP")
+  group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  matchesTeamA Match[]  @relation("TeamAPlayers")
+  matchesTeamB Match[]  @relation("TeamBPlayers")
 }
 
 model Match {
-    id           String   @id @default(cuid())
-    date         DateTime @default(now())
-    groupId      String
-    group        Group    @relation(fields: [groupId], references: [id])
-    teamAPlayers Player[] @relation("TeamAPlayers")
-    teamBPlayers Player[] @relation("TeamBPlayers")
-    winningTeam  String?
-    mvp          Player?  @relation("MVP", fields: [mvpId], references: [id])
-    mvpId        String?
-    scoreDiff    Int?
-    createdAt    DateTime @default(now())
-    updatedAt    DateTime @updatedAt
+  id           String   @id @default(cuid())
+  date         DateTime @default(now())
+  groupId      String
+  winningTeam  String?
+  scoreDiff    Int?     @default(0)
+  mvpId        String?
+  teamAScore   Int?
+  teamBScore   Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  mvp          Player?  @relation("MVP", fields: [mvpId], references: [id])
+  teamAPlayers Player[] @relation("TeamAPlayers")
+  teamBPlayers Player[] @relation("TeamBPlayers")
 }
