@@ -54,3 +54,66 @@ export async function createMatch(input: CreateMatchInput): Promise<Match> {
   revalidatePath(`/groups/${input.groupId}`);
   return match;
 }
+
+export async function deleteMatch(matchId: string, groupId: string) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    throw new Error("No autorizado");
+  }
+
+  await prisma.match.delete({
+    where: { id: matchId },
+  });
+
+  revalidatePath(`/groups/${groupId}`);
+}
+
+interface UpdateMatchInput {
+  matchId: string;
+  groupId: string;
+  teamAPlayers: string[];
+  teamBPlayers: string[];
+  winningTeam: string | null;
+  mvpId?: string;
+  scoreDiff?: number;
+}
+
+export async function updateMatch(input: UpdateMatchInput) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    throw new Error("No autorizado");
+  }
+
+  const updateData: Prisma.MatchUpdateInput = {
+    teamAPlayers: {
+      set: input.teamAPlayers.map((id) => ({ id })),
+    },
+    teamBPlayers: {
+      set: input.teamBPlayers.map((id) => ({ id })),
+    },
+    winningTeam: input.winningTeam,
+    scoreDiff: input.scoreDiff,
+    mvp: input.mvpId
+      ? {
+          connect: { id: input.mvpId },
+        }
+      : {
+          disconnect: true,
+        },
+  };
+
+  const match = await prisma.match.update({
+    where: { id: input.matchId },
+    data: updateData,
+    include: {
+      mvp: true,
+      teamAPlayers: true,
+      teamBPlayers: true,
+    },
+  });
+
+  revalidatePath(`/groups/${input.groupId}`);
+  return match;
+}

@@ -10,13 +10,16 @@ import {
   Trophy,
   Medal,
   Handshake,
+  MoreVertical,
+  Trash2,
+  Edit,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { CreateMatchDialog } from "@/components/matches/create-match-dialog";
 import { GroupWithDetails } from "@/types";
 import { AddPlayerDialog } from "../players/add-player-dialog";
-
+import { DeleteMatchAlert } from "../matches/delete-match-alert";
 import {
   pluralize,
   getGroupAverageSkill,
@@ -24,10 +27,21 @@ import {
   getTeamAverageSkill,
 } from "@/lib/utils/format";
 import { LevelBadge } from "../level-badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { EditMatchDialog } from "../matches/edit-match-dialog";
 
 export function GroupDetail({ group }: { group: GroupWithDetails }) {
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
+  const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
+  const [editMatch, setEditMatch] = useState<
+    GroupWithDetails["matches"][0] | null
+  >(null);
 
   return (
     <div className="space-y-6">
@@ -124,26 +138,68 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                 {(group.matches ?? []).map((match) => (
                   <div
                     key={match.id}
-                    className="rounded-lg border p-4 space-y-3"
+                    className="rounded-lg border group relative overflow-hidden"
                   >
-                    <div className="flex justify-between items-center text-sm relative">
-                      <span className="text-muted-foreground bg-muted/30 px-2.5 py-1 rounded-full text-sm">
-                        {formatDate(new Date(match.date))}
-                      </span>
-                      <span className="absolute left-1/2 -translate-x-1/2 text-sm font-medium text-muted-foreground bg-muted/30 px-3 py-1 rounded-full">
-                        {match.teamAPlayers.length}v{match.teamBPlayers.length}
-                      </span>
-                      <span className="font-medium">
-                        {match.winningTeam === null
-                          ? "Empate"
-                          : `${match.scoreDiff ?? 0} ${pluralize(
-                              match.scoreDiff ?? 0,
-                              "gol",
-                              "goles"
-                            )} de diferencia`}
-                      </span>
+                    <div className="bg-muted/30 px-4 py-2 flex items-center justify-between border-b">
+                      <div className="flex items-center gap-4">
+                        <span className="text-muted-foreground bg-muted/30 px-2.5 py-1 rounded-full text-sm">
+                          {formatDate(new Date(match.date))}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span
+                          className={cn(
+                            "text-sm font-medium px-3 py-1 rounded-full",
+                            match.winningTeam === null
+                              ? "bg-slate-100 text-slate-700"
+                              : "bg-blue-100 text-blue-700"
+                          )}
+                        >
+                          {match.winningTeam === null
+                            ? "Empate"
+                            : `${match.scoreDiff ?? 0} ${pluralize(
+                                match.scoreDiff ?? 0,
+                                "gol",
+                                "goles"
+                              )} de diferencia`}
+                        </span>
+                        <span className="text-[12px] font-bold text-muted-foreground/70 border px-2 py-1 rounded-md">
+                          {match.teamAPlayers.length}
+                          <span className="mx-0.5 text-[9px] font-black text-muted-foreground/70 tracking-widest">
+                            VS
+                          </span>
+                          {match.teamBPlayers.length}
+                        </span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 hover:bg-muted/50"
+                            >
+                              <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => setEditMatch(match)}
+                              className="group flex items-center gap-2 text-sm font-medium hover:bg-muted/50 focus:bg-muted/50"
+                            >
+                              <Edit className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                              Editar partido
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setDeleteMatchId(match.id)}
+                              className="group flex items-center gap-2 text-sm font-medium text-destructive/80 hover:text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive/70 group-hover:text-destructive transition-colors" />
+                              Eliminar partido
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-4 p-4">
                       <div
                         className={cn(
                           "space-y-2 p-3 rounded-lg",
@@ -267,6 +323,18 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
         players={group.players}
         open={matchDialogOpen}
         onOpenChange={setMatchDialogOpen}
+      />
+      <DeleteMatchAlert
+        matchId={deleteMatchId!}
+        groupId={group.id}
+        open={deleteMatchId !== null}
+        onOpenChange={(open) => !open && setDeleteMatchId(null)}
+      />
+      <EditMatchDialog
+        match={editMatch!}
+        players={group.players}
+        open={editMatch !== null}
+        onOpenChange={(open) => !open && setEditMatch(null)}
       />
     </div>
   );
