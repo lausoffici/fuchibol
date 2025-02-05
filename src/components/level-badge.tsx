@@ -5,12 +5,14 @@ interface LevelBadgeProps {
   level: number;
   showBadge?: boolean;
   className?: string;
+  showDecimals?: boolean;
 }
 
 export function LevelBadge({
   level,
   showBadge = true,
   className,
+  showDecimals = false,
 }: LevelBadgeProps) {
   const getSkillColor = (skill: number) => {
     if (skill >= 7) return "bg-green-500/20 text-green-700";
@@ -31,7 +33,9 @@ export function LevelBadge({
       <span className="text-[10px] uppercase font-semibold tracking-wider">
         Nivel
       </span>
-      <span className="font-semibold">{level.toFixed(1)}</span>
+      <span className="font-semibold">
+        {showDecimals ? level.toFixed(1) : Math.round(level)}
+      </span>
     </span>
   );
 }

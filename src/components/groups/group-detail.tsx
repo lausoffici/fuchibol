@@ -169,6 +169,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                           </h4>
                           <LevelBadge
                             level={getTeamAverageSkill(match.teamAPlayers)}
+                            showDecimals
                           />
                         </div>
                         <div className="space-y-1">
@@ -218,6 +219,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                           </h4>
                           <LevelBadge
                             level={getTeamAverageSkill(match.teamBPlayers)}
+                            showDecimals
                           />
                         </div>
                         <div className="space-y-1">
