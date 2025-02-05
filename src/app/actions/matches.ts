@@ -8,13 +8,11 @@ import { Match, Prisma } from "@prisma/client";
 
 interface CreateMatchInput {
   groupId: string;
-  teamA: string[];
-  teamB: string[];
-  winner: "A" | "B" | "DRAW";
-  scoreDiff?: number;
-  teamAScore?: number;
-  teamBScore?: number;
+  teamAPlayers: string[];
+  teamBPlayers: string[];
+  winningTeam: string | null;
   mvpId?: string;
+  scoreDiff?: number;
 }
 
 export async function createMatch(input: CreateMatchInput): Promise<Match> {
@@ -29,15 +27,13 @@ export async function createMatch(input: CreateMatchInput): Promise<Match> {
       connect: { id: input.groupId },
     },
     teamAPlayers: {
-      connect: input.teamA.map((id) => ({ id })),
+      connect: input.teamAPlayers.map((id) => ({ id })),
     },
     teamBPlayers: {
-      connect: input.teamB.map((id) => ({ id })),
+      connect: input.teamBPlayers.map((id) => ({ id })),
     },
-    winningTeam: input.winner === "DRAW" ? null : input.winner,
+    winningTeam: input.winningTeam,
     scoreDiff: input.scoreDiff,
-    teamAScore: input.teamAScore,
-    teamBScore: input.teamBScore,
   };
 
   if (input.mvpId) {

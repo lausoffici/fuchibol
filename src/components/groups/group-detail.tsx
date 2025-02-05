@@ -134,9 +134,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                         {match.teamAPlayers.length}v{match.teamBPlayers.length}
                       </span>
                       <span className="font-medium">
-                        {match.teamAScore !== null && match.teamBScore !== null
-                          ? `${match.teamAScore} - ${match.teamBScore}`
-                          : match.winningTeam === null
+                        {match.winningTeam === null
                           ? "Empate"
                           : `${match.scoreDiff ?? 0} ${pluralize(
                               match.scoreDiff ?? 0,

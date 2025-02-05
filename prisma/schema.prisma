@@ -49,16 +49,14 @@ model Player {
 model Match {
     id           String   @id @default(cuid())
     date         DateTime @default(now())
-    group        Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
     groupId      String
+    group        Group    @relation(fields: [groupId], references: [id])
     teamAPlayers Player[] @relation("TeamAPlayers")
     teamBPlayers Player[] @relation("TeamBPlayers")
     winningTeam  String?
-    scoreDiff    Int?     @default(0)
     mvp          Player?  @relation("MVP", fields: [mvpId], references: [id])
     mvpId        String?
-    teamAScore   Int?
-    teamBScore   Int?
+    scoreDiff    Int?
     createdAt    DateTime @default(now())
     updatedAt    DateTime @updatedAt
 }
