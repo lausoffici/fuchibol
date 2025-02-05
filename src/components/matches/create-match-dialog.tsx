@@ -67,9 +67,9 @@ export function CreateMatchDialog({
     try {
       await createMatch({
         groupId,
-        teamA: teamA.filter(Boolean),
-        teamB: teamB.filter(Boolean),
-        winner,
+        teamAPlayers: teamA.filter(Boolean),
+        teamBPlayers: teamB.filter(Boolean),
+        winningTeam: winner,
         scoreDiff: parseInt(scoreDiff),
         mvpId: mvp || undefined,
       });
