@@ -1,9 +1,10 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, ChevronRight, Trophy } from "lucide-react";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, ChevronRight, Trophy, Zap } from "lucide-react";
 import { CreateGroupButton } from "./create-group-button";
-import { cn } from "@/lib/utils";
+import { pluralize, getGroupAverageSkill } from "@/lib/utils/format";
+
 import Link from "next/link";
 
 interface Player {
@@ -22,12 +23,6 @@ interface Group {
   };
 }
 
-function getSkillColor(skill: number) {
-  if (skill >= 7) return "bg-emerald-500/20 text-emerald-700";
-  if (skill >= 4) return "bg-amber-500/20 text-amber-700";
-  return "bg-red-500/20 text-red-700";
-}
-
 export function GroupsList({ groups }: { groups: Group[] }) {
   return (
     <div className="space-y-8">
@@ -39,64 +34,50 @@ export function GroupsList({ groups }: { groups: Group[] }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {groups.map((group) => (
           <Link href={`/groups/${group.id}`} key={group.id}>
-            <Card className="hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer group">
+            <Card className="transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:bg-accent/40 hover:border-border cursor-pointer group">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-xl font-bold group-hover:text-primary transition-colors">
+                    <CardTitle className="text-xl font-bold text-foreground/90 group-hover:text-primary transition-colors duration-200">
                       {group.name}
                     </CardTitle>
                     <div className="flex items-center mt-2 text-muted-foreground gap-4">
                       <div className="flex items-center">
-                        <Users className="h-4 w-4 mr-1" />
+                        <Users className="h-4 w-4 mr-2" />
                         <span className="text-sm">
-                          {group._count.players} jugadores
+                          {group._count.players}{" "}
+                          {pluralize(
+                            group._count.players,
+                            "jugador",
+                            "jugadores"
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center">
-                        <Trophy className="h-4 w-4 mr-1" />
+                        <Trophy className="h-4 w-4 mr-2" />
                         <span className="text-sm">
-                          {group._count.matches} partidos
+                          {group._count.matches}{" "}
+                          {pluralize(
+                            group._count.matches,
+                            "partido",
+                            "partidos"
+                          )}
                         </span>
                       </div>
+                      {getGroupAverageSkill(group.players) > 0 && (
+                        <div className="flex items-center">
+                          <Zap className="h-4 w-4 mr-2" />
+                          <span className="text-sm">
+                            Nivel{" "}
+                            {getGroupAverageSkill(group.players).toFixed(1)}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                  <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-200" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-sm font-medium mb-2">Jugadores</div>
-                    {group.players.length > 0 ? (
-                      <div className="grid grid-cols-1 gap-2">
-                        {group.players.map((player) => (
-                          <div
-                            key={player.id}
-                            className="flex items-center justify-between rounded-lg border px-3 py-2"
-                          >
-                            <span className="text-sm font-medium">
-                              {player.name}
-                            </span>
-                            <span
-                              className={cn(
-                                "text-xs font-medium px-2 py-0.5 rounded-full",
-                                getSkillColor(player.skill)
-                              )}
-                            >
-                              {player.skill}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        No hay jugadores en este grupo
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
             </Card>
           </Link>
         ))}
