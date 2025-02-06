@@ -12,6 +12,7 @@ import {
   Edit,
   ChevronRight,
   Clock,
+  BarChart3,
 } from "lucide-react";
 import { useState } from "react";
 import { CreateMatchDialog } from "@/components/matches/create-match-dialog";
@@ -95,12 +96,20 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
       "(min-width: 1280px)": { slidesToScroll: 3 },
     },
   });
+  const [statsEmblaRef] = useEmblaCarousel({
+    align: "start",
+    slidesToScroll: 1,
+    breakpoints: {
+      "(min-width: 768px)": { slidesToScroll: 2 },
+      "(min-width: 1280px)": { slidesToScroll: 3 },
+    },
+  });
   const stats = getPlayerStats(group);
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4 pb-6 border-b">
-        <div className="space-y-4">
+      <div className="pb-6 border-b">
+        <div className="space-y-2">
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
             <Button
@@ -112,17 +121,17 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
               <Edit className="h-4 w-4" />
             </Button>
           </div>
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/30">
-              <Users className="h-4 w-4 text-muted-foreground" />
+          <div className="flex flex-wrap items-center gap-2 text-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30">
+              <Users className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="font-medium">
                 {group._count.players}{" "}
                 {pluralize(group._count.players, "jugador", "jugadores")}
               </span>
             </div>
 
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/30">
-              <Swords className="h-4 w-4 text-muted-foreground" />
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30">
+              <Swords className="h-3.5 w-3.5 text-muted-foreground" />
               <span className="font-medium">
                 {group._count.matches}{" "}
                 {pluralize(group._count.matches, "partido", "partidos")}
@@ -130,30 +139,31 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
             </div>
 
             {getGroupAverageSkill(group.players) > 0 && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/30">
-                <Zap className="h-4 w-4 text-muted-foreground" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30 shrink-0">
+                <Zap className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="font-medium">
                   Nivel {getGroupAverageSkill(group.players).toFixed(1)}
                 </span>
               </div>
             )}
-
-            {group.matches?.[0] && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/30">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">
-                  {(() => {
-                    const days = getDaysAgo(new Date(group.matches[0].date));
-                    return `Último partido hace ${days} ${pluralize(
-                      days,
-                      "día",
-                      "días"
-                    )}`;
-                  })()}
-                </span>
-              </div>
-            )}
           </div>
+        </div>
+        <div className="mt-6 mb-4">
+          {group.matches?.[0] && (
+            <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              <span>
+                {(() => {
+                  const days = getDaysAgo(new Date(group.matches[0].date));
+                  return `Último partido hace ${days} ${pluralize(
+                    days,
+                    "día",
+                    "días"
+                  )}`;
+                })()}
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex gap-3">
           <Button
@@ -177,14 +187,16 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
 
       <div className="space-y-8">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2 mb-6">
-            <Swords className="h-5 w-5 text-muted-foreground" />
-            Últimos partidos
-            <div className="ml-auto flex items-center gap-1 text-muted-foreground text-sm">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-6">
+            <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <Swords className="h-5 w-5 text-muted-foreground" />
+              Últimos partidos
+            </h2>
+            <div className="flex items-center gap-1 text-muted-foreground text-sm sm:ml-auto">
               <ChevronRight className="h-4 w-4 animate-bounceRight" />
               <span>Desliza para ver más</span>
             </div>
-          </h2>
+          </div>
           {(group.matches?.length ?? 0) > 0 ? (
             <div className="overflow-hidden" ref={emblaRef}>
               <div className={cn("flex gap-4 -ml-4")}>
@@ -260,178 +272,207 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
         </div>
 
         <div className="border-t pt-8">
-          <h2 className="text-2xl font-bold tracking-tight mb-6">
-            Estadísticas
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div>
-              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                <Swords className="h-5 w-5 text-muted-foreground" />
-                Partidos jugados
-              </h3>
-              <div className="space-y-2">
-                {stats.mostMatches.map((stat, i) => (
-                  <div
-                    key={stat.player.id}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border bg-card relative",
-                      i === 0 && "border-amber-500/30 bg-amber-50/30 shadow-sm",
-                      i === 1 && "border-zinc-400/30 bg-zinc-50/30",
-                      i === 2 && "border-orange-500/30 bg-orange-50/30"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg mr-2">
-                        {i === 0 && "🥇"}
-                        {i === 1 && "🥈"}
-                        {i === 2 && "🥉"}
-                      </span>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        {stat.player.name[0].toUpperCase()}
-                      </div>
-                      <span className="font-medium">{stat.player.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={cn(
-                          "text-muted-foreground",
-                          i === 0 && "text-amber-700 font-medium"
-                        )}
-                      >
-                        {stat.matches}{" "}
-                        {pluralize(stat.matches, "partido", "partidos")}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-6">
+            <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
+              Estadísticas
+            </h2>
+            <div className="flex items-center gap-1 text-muted-foreground text-sm sm:ml-auto">
+              <ChevronRight className="h-4 w-4 animate-bounceRight" />
+              <span>Desliza para ver más</span>
             </div>
-
-            <div>
-              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                <MvpBadge className="scale-90" />
-                MVPs
-              </h3>
-              <div className="space-y-2">
-                {stats.mostMvps.map((stat, i) => (
-                  <div
-                    key={stat.player.id}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border bg-card relative",
-                      i === 0 && "border-amber-500/30 bg-amber-50/30 shadow-sm",
-                      i === 1 && "border-zinc-400/30 bg-zinc-50/30",
-                      i === 2 && "border-orange-500/30 bg-orange-50/30"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg mr-2">
-                        {i === 0 && "🥇"}
-                        {i === 1 && "🥈"}
-                        {i === 2 && "🥉"}
-                      </span>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        {stat.player.name[0].toUpperCase()}
-                      </div>
-                      <span className="font-medium">{stat.player.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
+          </div>
+          <div className="overflow-hidden" ref={statsEmblaRef}>
+            <div className={cn("flex gap-6")}>
+              <div>
+                <div className="min-w-[85vw] sm:min-w-[350px] lg:min-w-[400px]">
+                  <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                    <Swords className="h-5 w-5 text-muted-foreground" />
+                    Partidos jugados
+                  </h3>
+                  <div className="space-y-2">
+                    {stats.mostMatches.map((stat, i) => (
+                      <div
+                        key={stat.player.id}
                         className={cn(
-                          "text-muted-foreground",
-                          i === 0 && "text-amber-700 font-medium"
+                          "flex items-center justify-between p-3 rounded-lg border bg-card relative",
+                          i === 0 &&
+                            "border-amber-500/30 bg-amber-50/30 shadow-sm",
+                          i === 1 && "border-zinc-400/30 bg-zinc-50/30",
+                          i === 2 && "border-orange-500/30 bg-orange-50/30"
                         )}
                       >
-                        {stat.mvps} {pluralize(stat.mvps, "MVP", "MVPs")}
-                      </span>
-                    </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg mr-2">
+                            {i === 0 && "🥇"}
+                            {i === 1 && "🥈"}
+                            {i === 2 && "🥉"}
+                          </span>
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                            {stat.player.name[0].toUpperCase()}
+                          </div>
+                          <span className="font-medium">
+                            {stat.player.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              "text-muted-foreground",
+                              i === 0 && "text-amber-700 font-medium"
+                            )}
+                          >
+                            {stat.matches}{" "}
+                            {pluralize(stat.matches, "partido", "partidos")}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                <WinnerBadge className="scale-90" />
-                Victorias
-              </h3>
-              <div className="space-y-2">
-                {stats.mostWins.map((stat, i) => (
-                  <div
-                    key={stat.player.id}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border bg-card relative",
-                      i === 0 && "border-amber-500/30 bg-amber-50/30 shadow-sm",
-                      i === 1 && "border-zinc-400/30 bg-zinc-50/30",
-                      i === 2 && "border-orange-500/30 bg-orange-50/30"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg mr-2">
-                        {i === 0 && "🥇"}
-                        {i === 1 && "🥈"}
-                        {i === 2 && "🥉"}
-                      </span>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        {stat.player.name[0].toUpperCase()}
-                      </div>
-                      <span className="font-medium">{stat.player.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
+              <div>
+                <div className="min-w-[85vw] sm:min-w-[350px] lg:min-w-[400px]">
+                  <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                    <MvpBadge className="scale-90" />
+                    MVPs
+                  </h3>
+                  <div className="space-y-2">
+                    {stats.mostMvps.map((stat, i) => (
+                      <div
+                        key={stat.player.id}
                         className={cn(
-                          "text-muted-foreground",
-                          i === 0 && "text-amber-700 font-medium"
+                          "flex items-center justify-between p-3 rounded-lg border bg-card relative",
+                          i === 0 &&
+                            "border-amber-500/30 bg-amber-50/30 shadow-sm",
+                          i === 1 && "border-zinc-400/30 bg-zinc-50/30",
+                          i === 2 && "border-orange-500/30 bg-orange-50/30"
                         )}
                       >
-                        {stat.wins}{" "}
-                        {pluralize(stat.wins, "victoria", "victorias")}
-                      </span>
-                    </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg mr-2">
+                            {i === 0 && "🥇"}
+                            {i === 1 && "🥈"}
+                            {i === 2 && "🥉"}
+                          </span>
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                            {stat.player.name[0].toUpperCase()}
+                          </div>
+                          <span className="font-medium">
+                            {stat.player.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              "text-muted-foreground",
+                              i === 0 && "text-amber-700 font-medium"
+                            )}
+                          >
+                            {stat.mvps} {pluralize(stat.mvps, "MVP", "MVPs")}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
 
-            <div>
-              <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
-                <LoserBadge className="scale-90" />
-                Derrotas
-              </h3>
-              <div className="space-y-2">
-                {stats.mostLosses.map((stat, i) => (
-                  <div
-                    key={stat.player.id}
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg border bg-card relative",
-                      i === 0 && "border-amber-500/30 bg-amber-50/30 shadow-sm",
-                      i === 1 && "border-zinc-400/30 bg-zinc-50/30",
-                      i === 2 && "border-orange-500/30 bg-orange-50/30"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg mr-2">
-                        {i === 0 && "🥇"}
-                        {i === 1 && "🥈"}
-                        {i === 2 && "🥉"}
-                      </span>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        {stat.player.name[0].toUpperCase()}
-                      </div>
-                      <span className="font-medium">{stat.player.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span
+              <div>
+                <div className="min-w-[85vw] sm:min-w-[350px] lg:min-w-[400px]">
+                  <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                    <WinnerBadge className="scale-90" />
+                    Victorias
+                  </h3>
+                  <div className="space-y-2">
+                    {stats.mostWins.map((stat, i) => (
+                      <div
+                        key={stat.player.id}
                         className={cn(
-                          "text-muted-foreground",
-                          i === 0 && "text-amber-700 font-medium"
+                          "flex items-center justify-between p-3 rounded-lg border bg-card relative",
+                          i === 0 &&
+                            "border-amber-500/30 bg-amber-50/30 shadow-sm",
+                          i === 1 && "border-zinc-400/30 bg-zinc-50/30",
+                          i === 2 && "border-orange-500/30 bg-orange-50/30"
                         )}
                       >
-                        {stat.losses}{" "}
-                        {pluralize(stat.losses, "derrota", "derrotas")}
-                      </span>
-                    </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg mr-2">
+                            {i === 0 && "🥇"}
+                            {i === 1 && "🥈"}
+                            {i === 2 && "🥉"}
+                          </span>
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                            {stat.player.name[0].toUpperCase()}
+                          </div>
+                          <span className="font-medium">
+                            {stat.player.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              "text-muted-foreground",
+                              i === 0 && "text-amber-700 font-medium"
+                            )}
+                          >
+                            {stat.wins}{" "}
+                            {pluralize(stat.wins, "victoria", "victorias")}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="min-w-[85vw] sm:min-w-[350px] lg:min-w-[400px]">
+                  <h3 className="text-lg font-semibold flex items-center gap-2 mb-4">
+                    <LoserBadge className="scale-90" />
+                    Derrotas
+                  </h3>
+                  <div className="space-y-2">
+                    {stats.mostLosses.map((stat, i) => (
+                      <div
+                        key={stat.player.id}
+                        className={cn(
+                          "flex items-center justify-between p-3 rounded-lg border bg-card relative",
+                          i === 0 &&
+                            "border-amber-500/30 bg-amber-50/30 shadow-sm",
+                          i === 1 && "border-zinc-400/30 bg-zinc-50/30",
+                          i === 2 && "border-orange-500/30 bg-orange-50/30"
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg mr-2">
+                            {i === 0 && "🥇"}
+                            {i === 1 && "🥈"}
+                            {i === 2 && "🥉"}
+                          </span>
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                            {stat.player.name[0].toUpperCase()}
+                          </div>
+                          <span className="font-medium">
+                            {stat.player.name}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={cn(
+                              "text-muted-foreground",
+                              i === 0 && "text-amber-700 font-medium"
+                            )}
+                          >
+                            {stat.losses}{" "}
+                            {pluralize(stat.losses, "derrota", "derrotas")}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
           </div>
