@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import {
   Select,
   SelectContent,
@@ -93,13 +88,14 @@ export function CreateMatchDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Registrar partido</DialogTitle>
-        </DialogHeader>
-
-        <div className="grid grid-cols-2 gap-6 py-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Registrar partido"
+      className="sm:max-w-[500px]"
+    >
+      <div className="space-y-6 py-2 sm:py-4">
+        <div className="grid grid-cols-2 gap-6">
           <div className="space-y-4">
             <h3 className="font-medium">Equipo A</h3>
             {[0, 1, 2, 3, 4].map((index) => (
@@ -171,136 +167,132 @@ export function CreateMatchDialog({
           </div>
         </div>
 
-        <div className="space-y-4 pt-4 border-t">
-          <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h3 className="text-sm font-medium">Resultado</h3>
+            <Select
+              value={winner}
+              onValueChange={(value: "A" | "B" | "DRAW") => {
+                setWinner(value);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar ganador">
+                  {winner === "A"
+                    ? "Ganó Equipo A"
+                    : winner === "B"
+                    ? "Ganó Equipo B"
+                    : winner === "DRAW"
+                    ? "Empate"
+                    : "Seleccionar ganador"}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="A">Ganó Equipo A</SelectItem>
+                <SelectItem value="B">Ganó Equipo B</SelectItem>
+                <SelectItem value="DRAW">Empate</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {winner && winner !== "DRAW" && (
             <div className="space-y-2">
-              <h3 className="text-sm font-medium">Resultado</h3>
-              <Select
-                value={winner}
-                onValueChange={(value: "A" | "B" | "DRAW") => {
-                  setWinner(value);
-                }}
-              >
+              <h3 className="text-sm font-medium">Diferencia de goles</h3>
+              <Select value={scoreDiff} onValueChange={setScoreDiff}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar ganador">
-                    {winner === "A"
-                      ? "Ganó Equipo A"
-                      : winner === "B"
-                      ? "Ganó Equipo B"
-                      : winner === "DRAW"
-                      ? "Empate"
-                      : "Seleccionar ganador"}
+                  <SelectValue placeholder="Seleccionar diferencia">
+                    {scoreDiff
+                      ? `${scoreDiff} ${
+                          parseInt(scoreDiff) === 1 ? "gol" : "goles"
+                        }`
+                      : "Seleccionar diferencia"}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="A">Ganó Equipo A</SelectItem>
-                  <SelectItem value="B">Ganó Equipo B</SelectItem>
-                  <SelectItem value="DRAW">Empate</SelectItem>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                    <SelectItem key={n} value={n.toString()}>
+                      {n} {n === 1 ? "gol" : "goles"}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+          )}
 
-            {winner && (
-              <div className="space-y-2">
-                {winner !== "DRAW" && (
-                  <>
-                    <h3 className="text-sm font-medium">Diferencia de goles</h3>
-                    <Select value={scoreDiff} onValueChange={setScoreDiff}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Seleccionar diferencia">
-                          {scoreDiff
-                            ? `${scoreDiff} ${
-                                parseInt(scoreDiff) === 1 ? "gol" : "goles"
-                              }`
-                            : "Seleccionar diferencia"}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                          <SelectItem key={n} value={n.toString()}>
-                            {n} {n === 1 ? "gol" : "goles"}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </>
-                )}
+          {winner && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-medium">MVP (opcional)</h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger className="text-muted-foreground">
+                      <HelpCircle className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-[250px]">
+                      <p>
+                        Most Valuable Player (MVP) - Jugador que tuvo el mejor
+                        rendimiento o mayor impacto en el partido, ya sea por
+                        goles, asistencias o juego en general.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
-            )}
+              <Select value={mvp} onValueChange={setMvp}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar jugador">
+                    {players.find((p) => p.id === mvp)?.name}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {[...teamA, ...teamB].filter(Boolean).length > 0 ? (
+                    [...teamA, ...teamB].filter(Boolean).map((playerId) => {
+                      const player = players.find((p) => p.id === playerId);
+                      if (!player) return null;
 
-            {winner && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-medium">MVP (opcional)</h3>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger className="text-muted-foreground">
-                        <HelpCircle className="h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-[250px]">
-                        <p>
-                          Most Valuable Player (MVP) - Jugador que tuvo el mejor
-                          rendimiento o mayor impacto en el partido, ya sea por
-                          goles, asistencias o juego en general.
-                        </p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-                <Select value={mvp} onValueChange={setMvp}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar jugador">
-                      {players.find((p) => p.id === mvp)?.name}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {[...teamA, ...teamB].filter(Boolean).length > 0 ? (
-                      [...teamA, ...teamB].filter(Boolean).map((playerId) => {
-                        const player = players.find((p) => p.id === playerId);
-                        if (!player) return null;
-
-                        const team = teamA.includes(playerId) ? "A" : "B";
-                        return (
-                          <SelectItem key={player.id} value={player.id}>
-                            {player.name} (Equipo {team})
-                          </SelectItem>
-                        );
-                      })
-                    ) : (
-                      <div className="relative flex items-center justify-center py-6 text-sm text-muted-foreground">
-                        Selecciona jugadores en los equipos
-                      </div>
-                    )}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
-
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={
-                loading ||
-                !winner ||
-                teamA.filter(Boolean).length === 0 ||
-                teamB.filter(Boolean).length === 0 ||
-                teamA.filter(Boolean).length !== teamB.filter(Boolean).length ||
-                (winner !== "DRAW" && !scoreDiff)
-              }
-            >
-              {loading ? "Guardando..." : "Guardar partido"}
-            </Button>
-          </div>
+                      const team = teamA.includes(playerId) ? "A" : "B";
+                      return (
+                        <SelectItem key={player.id} value={player.id}>
+                          {player.name} (Equipo {team})
+                        </SelectItem>
+                      );
+                    })
+                  ) : (
+                    <div className="relative flex items-center justify-center py-6 text-sm text-muted-foreground">
+                      Selecciona jugadores en los equipos
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
         </div>
-      </DialogContent>
-    </Dialog>
+
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+            className="sm:w-auto w-full"
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={
+              loading ||
+              !winner ||
+              teamA.filter(Boolean).length === 0 ||
+              teamB.filter(Boolean).length === 0 ||
+              teamA.filter(Boolean).length !== teamB.filter(Boolean).length ||
+              (winner !== "DRAW" && !scoreDiff)
+            }
+            className="sm:w-auto w-full"
+          >
+            {loading ? "Guardando..." : "Guardar partido"}
+          </Button>
+        </div>
+      </div>
+    </ResponsiveDialog>
   );
 }

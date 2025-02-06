@@ -1,17 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { addPlayerToGroup } from "@/app/actions/groups";
 import { PlayerInput } from "@/components/groups/player-input";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 interface AddPlayerDialogProps {
   groupId: string;
@@ -64,36 +60,33 @@ export function AddPlayerDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Agregar jugadores</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4 py-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Agregar jugadores"
+      className="sm:max-w-[500px]"
+    >
+      <div className="space-y-6 py-4 sm:py-6">
+        <div className="space-y-4">
+          <div className="grid grid-cols-[1fr_80px] gap-2 text-sm">
+            <Label>Nombre</Label>
+            <Label>Nivel</Label>
+          </div>
           {players.map((player, index) => (
-            <div key={index} className="flex items-start gap-2">
-              <PlayerInput
-                value={player}
-                onChange={(value) => {
-                  const newPlayers = [...players];
-                  newPlayers[index] = value;
-                  setPlayers(newPlayers);
-                }}
-                loading={loading}
-              />
-              {players.length > 1 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="shrink-0"
-                  onClick={() => {
-                    setPlayers(players.filter((_, i) => i !== index));
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
+            <PlayerInput
+              key={index}
+              value={player}
+              onChange={(value) => {
+                const newPlayers = [...players];
+                newPlayers[index] = value;
+                setPlayers(newPlayers);
+              }}
+              loading={loading}
+              isLast={players.length === 1}
+              onRemove={() => {
+                setPlayers(players.filter((_, i) => i !== index));
+              }}
+            />
           ))}
           <Button
             variant="outline"
@@ -106,22 +99,25 @@ export function AddPlayerDialog({
             Agregar otro jugador
           </Button>
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="border-t" />
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={loading}
+            className="sm:w-auto w-full"
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={loading || players.some((p) => !p.name)}
+            className="sm:w-auto w-full"
           >
             {loading ? "Guardando..." : "Guardar jugadores"}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </ResponsiveDialog>
   );
 }

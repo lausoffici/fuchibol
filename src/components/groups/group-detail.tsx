@@ -234,7 +234,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                         />
                       </div>
                       <div className="absolute right-2 top-2">
-                        <DropdownMenu>
+                        <DropdownMenu modal={false}>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"

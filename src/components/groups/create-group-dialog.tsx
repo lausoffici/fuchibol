@@ -1,14 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
@@ -74,65 +67,65 @@ export function CreateGroupDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>Crear nuevo grupo</DialogTitle>
-            <DialogDescription>
-              Crea un grupo y agrega jugadores con su nivel de habilidad
-            </DialogDescription>
-          </DialogHeader>
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Crear nuevo grupo"
+      className="sm:max-w-[500px]"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <p className="text-sm text-muted-foreground">
+          Crea un grupo y agrega jugadores con su nivel de habilidad
+        </p>
 
-          <div className="mt-6 space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nombre del grupo</Label>
-              <Input
-                id="name"
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-                placeholder="ej. Fútbol de los jueves"
-                disabled={loading}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Label>Jugadores</Label>
-              {players.map((player, index) => (
-                <PlayerInput
-                  key={index}
-                  value={player}
-                  onChange={(player) => handlePlayerChange(index, player)}
-                  loading={loading}
-                />
-              ))}
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={handleAddPlayer}
-                disabled={loading}
-              >
-                Agregar jugador
-              </Button>
-            </div>
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nombre del grupo</Label>
+            <Input
+              id="name"
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              placeholder="ej. Fútbol de los jueves"
+              disabled={loading}
+            />
           </div>
 
-          <DialogFooter className="mt-6">
+          <div className="space-y-4">
+            <Label>Jugadores</Label>
+            {players.map((player, index) => (
+              <PlayerInput
+                key={index}
+                value={player}
+                onChange={(player) => handlePlayerChange(index, player)}
+                loading={loading}
+              />
+            ))}
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              className="w-full"
+              onClick={handleAddPlayer}
               disabled={loading}
             >
-              Cancelar
+              Agregar jugador
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Creando..." : "Crear grupo"}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Creando..." : "Crear grupo"}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
   );
 }

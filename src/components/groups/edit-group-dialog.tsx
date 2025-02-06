@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { updateGroup } from "@/app/actions/groups";
@@ -31,7 +26,12 @@ export function EditGroupDialog({
   onOpenChange,
 }: EditGroupDialogProps) {
   const { toast } = useToast();
-  const { register, handleSubmit, reset } = useForm<EditGroupFormValues>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = useForm<EditGroupFormValues>();
 
   useEffect(() => {
     if (open) {
@@ -57,28 +57,44 @@ export function EditGroupDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Editar grupo</DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title="Editar nombre del grupo"
+      className="sm:max-w-[425px]"
+    >
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="space-y-6 py-2 sm:py-4"
+      >
+        <div className="space-y-4">
           <div className="space-y-2">
             <Input
               placeholder="Nombre del grupo"
               {...register("name", { required: true })}
             />
           </div>
+        </div>
 
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancelar
-            </Button>
-            <Button type="submit">Guardar cambios</Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+            className="sm:w-auto w-full"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="sm:w-auto w-full"
+          >
+            {isSubmitting ? "Guardando..." : "Guardar cambios"}
+          </Button>
+        </div>
+      </form>
+    </ResponsiveDialog>
   );
 }
