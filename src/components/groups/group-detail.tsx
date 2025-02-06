@@ -10,6 +10,7 @@ import {
   MoreVertical,
   Trash2,
   Edit,
+  ChevronRight,
 } from "lucide-react";
 import { useState } from "react";
 import { CreateMatchDialog } from "@/components/matches/create-match-dialog";
@@ -116,6 +117,10 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
           <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
             <Swords className="h-5 w-5 text-muted-foreground" />
             Últimos partidos
+            <div className="ml-auto flex items-center gap-1 text-muted-foreground text-sm">
+              <ChevronRight className="h-4 w-4 animate-bounceRight" />
+              <span>Desliza para ver más</span>
+            </div>
           </h2>
           {(group.matches?.length ?? 0) > 0 ? (
             <div className="overflow-hidden" ref={emblaRef}>

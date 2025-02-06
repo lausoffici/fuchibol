@@ -34,7 +34,7 @@ export function GroupsList({ groups }: { groups: Group[] }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {groups.map((group) => (
           <Link href={`/groups/${group.id}`} key={group.id}>
-            <Card className="transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:bg-accent/40 hover:border-border cursor-pointer group">
+            <Card className="transition-all duration-200 hover:scale-[1.01] hover:shadow-md hover:bg-accent/40 cursor-pointer group">
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
