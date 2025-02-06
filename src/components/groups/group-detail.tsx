@@ -108,8 +108,8 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
 
   return (
     <div className="space-y-6">
-      <div className="pb-6 border-b">
-        <div className="space-y-2">
+      <div className="pb-6 border-b space-y-6">
+        <div>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
             <Button
@@ -121,6 +121,24 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
               <Edit className="h-4 w-4" />
             </Button>
           </div>
+          {group.matches?.[0] && (
+            <div className="text-sm text-muted-foreground flex items-center gap-1.5 mt-2">
+              <Clock className="h-3.5 w-3.5" />
+              <span>
+                {(() => {
+                  const days = getDaysAgo(new Date(group.matches[0].date));
+                  return `Último partido hace ${days} ${pluralize(
+                    days,
+                    "día",
+                    "días"
+                  )}`;
+                })()}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-6">
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30">
               <Users className="h-3.5 w-3.5 text-muted-foreground" />
@@ -147,41 +165,24 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
               </div>
             )}
           </div>
-        </div>
-        <div className="mt-6 mb-4">
-          {group.matches?.[0] && (
-            <div className="text-sm text-muted-foreground flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5" />
-              <span>
-                {(() => {
-                  const days = getDaysAgo(new Date(group.matches[0].date));
-                  return `Último partido hace ${days} ${pluralize(
-                    days,
-                    "día",
-                    "días"
-                  )}`;
-                })()}
-              </span>
-            </div>
-          )}
-        </div>
-        <div className="flex gap-3">
-          <Button
-            variant="default"
-            onClick={() => setMatchDialogOpen(true)}
-            className="flex-1"
-          >
-            <Swords className="h-4 w-4 mr-2" />
-            Registrar partido
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setPlayerDialogOpen(true)}
-            className="flex-1"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Agregar jugadores
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              variant="default"
+              onClick={() => setMatchDialogOpen(true)}
+              className="flex-1"
+            >
+              <Swords className="h-4 w-4 mr-2" />
+              Registrar partido
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setPlayerDialogOpen(true)}
+              className="flex-1"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Agregar jugadores
+            </Button>
+          </div>
         </div>
       </div>
 

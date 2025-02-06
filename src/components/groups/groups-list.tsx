@@ -41,7 +41,7 @@ export function GroupsList({ groups }: { groups: Group[] }) {
                     <CardTitle className="text-xl font-bold text-foreground/90 group-hover:text-primary transition-colors duration-200">
                       {group.name}
                     </CardTitle>
-                    <div className="flex items-center mt-2 text-muted-foreground gap-4">
+                    <div className="flex flex-wrap items-center mt-2 text-muted-foreground gap-2">
                       <div className="flex items-center">
                         <Users className="h-4 w-4 mr-2" />
                         <span className="text-sm">
