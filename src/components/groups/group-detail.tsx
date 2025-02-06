@@ -480,25 +480,9 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="h-12 w-12 rounded-full bg-muted/30 flex items-center justify-center mb-4">
-                <BarChart3 className="h-6 w-6 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-medium mb-2">
-                No hay estadísticas disponibles
-              </h3>
-              <p className="text-muted-foreground text-sm max-w-[300px]">
-                Registra algunos partidos para ver las estadísticas del grupo
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => setMatchDialogOpen(true)}
-                className="mt-6"
-              >
-                <Swords className="h-4 w-4 mr-2" />
-                Registrar partido
-              </Button>
-            </div>
+            <p className="text-muted-foreground">
+              No hay estadísticas disponibles
+            </p>
           )}
         </div>
 
