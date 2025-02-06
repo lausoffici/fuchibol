@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Users,
@@ -32,7 +32,6 @@ import { EditMatchDialog } from "../matches/edit-match-dialog";
 import { TeamCard } from "../matches/team-card";
 import { EditGroupDialog } from "./edit-group-dialog";
 import useEmblaCarousel from "embla-carousel-react";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
 
 export function GroupDetail({ group }: { group: GroupWithDetails }) {
@@ -43,8 +42,14 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
     GroupWithDetails["matches"][0] | null
   >(null);
   const [editGroupOpen, setEditGroupOpen] = useState(false);
-  const [emblaRef] = useEmblaCarousel({ align: "start" });
-  const isMobile = useMediaQuery("(max-width: 640px)");
+  const [emblaRef] = useEmblaCarousel({
+    align: "start",
+    slidesToScroll: 1,
+    breakpoints: {
+      "(min-width: 640px)": { slidesToScroll: 2 },
+      "(min-width: 1280px)": { slidesToScroll: 3 },
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -113,17 +118,14 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
             Últimos partidos
           </h2>
           {(group.matches?.length ?? 0) > 0 ? (
-            <div
-              className={cn("space-y-4", isMobile && "overflow-hidden")}
-              ref={isMobile ? emblaRef : undefined}
-            >
-              <div className={cn("flex", isMobile && "-ml-4 gap-4")}>
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className={cn("flex gap-4 -ml-4")}>
                 {(group.matches ?? []).map((match) => (
                   <Card
                     key={match.id}
                     className={cn(
                       "shadow-sm transition-all",
-                      isMobile && "min-w-[85%] first:ml-4 snap-center"
+                      "min-w-[85%] sm:min-w-[45%] xl:min-w-[30%] first:ml-4 snap-center"
                     )}
                   >
                     <div className="group relative overflow-hidden flex flex-col">
@@ -134,7 +136,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                           </span>
                         </div>
                       </div>
-                      <div className="flex flex-col sm:grid sm:grid-cols-2 gap-3 p-4">
+                      <div className="flex flex-col gap-4 p-4">
                         <TeamCard
                           team="A"
                           players={match.teamAPlayers}
@@ -189,38 +191,34 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
           )}
         </div>
 
-        <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Users className="h-5 w-5 text-muted-foreground" />
-              Jugadores
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {group.players.length > 0 ? (
-              <div className="grid grid-cols-1 gap-3">
-                {group.players.map((player) => (
-                  <div
-                    key={player.id}
-                    className="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        {player.name[0].toUpperCase()}
-                      </div>
-                      <span className="font-medium">{player.name}</span>
+        <div>
+          <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+            <Users className="h-5 w-5 text-muted-foreground" />
+            Jugadores
+          </h2>
+          {group.players.length > 0 ? (
+            <div className="grid grid-cols-1 gap-3">
+              {group.players.map((player) => (
+                <div
+                  key={player.id}
+                  className="flex items-center justify-between rounded-lg border px-4 py-3 hover:bg-muted/50 transition-colors bg-card"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                      {player.name[0].toUpperCase()}
                     </div>
-                    <LevelBadge level={player.skill} />
+                    <span className="font-medium">{player.name}</span>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">
-                No hay jugadores en este grupo
-              </p>
-            )}
-          </CardContent>
-        </Card>
+                  <LevelBadge level={player.skill} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">
+              No hay jugadores en este grupo
+            </p>
+          )}
+        </div>
       </div>
 
       <AddPlayerDialog
