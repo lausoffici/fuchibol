@@ -103,7 +103,8 @@ export function EditMatchDialog({
         groupId: match.groupId,
         teamAPlayers: data.teamAPlayers.filter(Boolean),
         teamBPlayers: data.teamBPlayers.filter(Boolean),
-        winningTeam: data.winningTeam === "DRAW" ? null : data.winningTeam,
+        winningTeam:
+          data.winningTeam === "DRAW" ? null : (data.winningTeam as "A" | "B"),
         scoreDiff: parseInt(data.scoreDiff),
         mvpId: data.mvpId || undefined,
       });

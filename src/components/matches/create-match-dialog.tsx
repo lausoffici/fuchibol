@@ -69,7 +69,7 @@ export function CreateMatchDialog({
         groupId,
         teamAPlayers: teamA.filter(Boolean),
         teamBPlayers: teamB.filter(Boolean),
-        winningTeam: winner,
+        winningTeam: winner === "DRAW" ? null : winner,
         scoreDiff: parseInt(scoreDiff),
         mvpId: mvp || undefined,
       });
