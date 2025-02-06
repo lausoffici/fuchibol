@@ -480,7 +480,10 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
         </div>
 
         <div className="border-t pt-8">
-          <h2 className="text-2xl font-bold tracking-tight mb-6">Jugadores</h2>
+          <h2 className="text-2xl font-bold tracking-tight mb-6 flex items-center gap-2">
+            <Users className="h-5 w-5 text-muted-foreground" />
+            Jugadores
+          </h2>
           <div>
             {group.players.length > 0 ? (
               <div className="grid grid-cols-1 gap-3">

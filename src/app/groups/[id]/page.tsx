@@ -24,8 +24,8 @@ export default async function GroupPage({ params }: PageProps<{ id: string }>) {
 
   return (
     <div className="min-h-screen p-4">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div className="flex items-center gap-4">
+      <div className="max-w-7xl mx-auto space-y-4">
+        <div className="flex items-center gap-2 text-muted-foreground">
           <Button asChild variant="ghost" size="sm">
             <Link href="/">
               <ChevronLeft className="h-4 w-4 mr-1" />
