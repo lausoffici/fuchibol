@@ -1,6 +1,6 @@
-export const pluralize = (count: number, singular: string, plural: string) => {
+export function pluralize(count: number, singular: string, plural: string) {
   return count === 1 ? singular : plural;
-};
+}
 
 export const getSkillColor = (skill: number) => {
   if (skill >= 7) return "bg-emerald-500/20 text-emerald-700";
@@ -28,4 +28,9 @@ export function formatDate(date: Date) {
     .format(date)
     .replace(".", "")
     .toLowerCase();
+}
+
+export function getDaysAgo(date: Date) {
+  const diffTime = Math.abs(new Date().getTime() - date.getTime());
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
