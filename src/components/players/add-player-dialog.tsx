@@ -7,7 +7,6 @@ import { useToast } from "@/hooks/use-toast";
 import { addPlayerToGroup } from "@/app/actions/groups";
 import { PlayerInput } from "@/components/groups/player-input";
 import { Plus } from "lucide-react";
-import { Label } from "@/components/ui/label";
 
 interface AddPlayerDialogProps {
   groupId: string;
@@ -68,10 +67,6 @@ export function AddPlayerDialog({
     >
       <div className="space-y-6 py-4 sm:py-6">
         <div className="space-y-4">
-          <div className="grid grid-cols-[1fr_80px] gap-2 text-sm">
-            <Label>Nombre</Label>
-            <Label>Nivel</Label>
-          </div>
           {players.map((player, index) => (
             <PlayerInput
               key={index}
@@ -86,6 +81,7 @@ export function AddPlayerDialog({
               onRemove={() => {
                 setPlayers(players.filter((_, i) => i !== index));
               }}
+              showLabels={index === 0}
             />
           ))}
           <Button
