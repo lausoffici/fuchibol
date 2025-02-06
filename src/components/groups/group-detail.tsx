@@ -98,8 +98,8 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
           {(group.matches?.length ?? 0) > 0 ? (
             <div className="space-y-4">
               {(group.matches ?? []).map((match) => (
-                <Card key={match.id} className="shadow-none">
-                  <div className="rounded-lg border group relative overflow-hidden flex flex-col">
+                <Card key={match.id} className="shadow-sm">
+                  <div className="group relative overflow-hidden flex flex-col">
                     <div className="bg-muted/30 px-4 py-2 flex flex-col sm:flex-row sm:items-center gap-2 border-b text-center">
                       <div className="flex items-center justify-center flex-1">
                         <span className="text-muted-foreground bg-muted/30 px-2.5 py-1 rounded-full text-sm">
@@ -161,7 +161,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
           )}
         </div>
 
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-xl flex items-center gap-2">
               <Users className="h-5 w-5 text-muted-foreground" />
