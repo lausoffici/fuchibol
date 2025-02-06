@@ -31,7 +31,7 @@ export function TeamCard({
   return (
     <div
       className={cn(
-        "space-y-2.5 p-4 rounded-lg border transition-all",
+        "p-3 rounded-lg border transition-all",
         isWinner
           ? "border-emerald-200/70 bg-emerald-50/80 shadow-[0_0_0_1px_rgba(16,185,129,0.1)] hover:shadow-[0_0_0_1px_rgba(16,185,129,0.2)]"
           : winningTeam === null
@@ -39,8 +39,7 @@ export function TeamCard({
           : "border-zinc-200/50 bg-zinc-100/50 hover:border-zinc-200/70"
       )}
     >
-      <div className="flex items-center justify-between w-full">
-        <h4 className="font-semibold text-base text-zinc-900">Equipo {team}</h4>
+      <div className="flex items-center justify-center w-full mb-2">
         <div className="flex items-center gap-1.5">
           {winningTeam === null && <DrawBadge />}
           {isWinner && <WinnerBadge />}
@@ -54,20 +53,23 @@ export function TeamCard({
           <LevelBadge level={getTeamAverageSkill(players)} showDecimals short />
         </div>
       </div>
-      <div className="space-y-1.5 mt-1">
+      <div className="space-y-1">
         {players.map((player) => (
           <div
             key={player.id}
             className={cn(
-              "text-sm flex items-center gap-2.5 px-2 py-1 -mx-2 rounded-md relative",
+              "text-sm flex items-center gap-2 px-2 py-1 -mx-2 rounded-md relative",
               mvp?.id === player.id && "font-medium"
             )}
           >
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-100 text-xs text-zinc-600 font-medium shrink-0">
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-100 text-xs text-zinc-600 font-medium shrink-0">
               {player.name[0].toUpperCase()}
             </div>
             {player.name}
-            {mvp?.id === player.id && <MvpBadge />}
+            <div className="ml-auto flex items-center gap-1.5">
+              {mvp?.id === player.id && <MvpBadge />}
+              <LevelBadge level={player.skill} short />
+            </div>
           </div>
         ))}
       </div>

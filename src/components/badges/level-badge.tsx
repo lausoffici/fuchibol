@@ -25,17 +25,22 @@ export function LevelBadge({
   return (
     <span
       className={cn(
-        "flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded-full border",
+        "inline-flex items-center text-xs font-medium px-1.5 py-0.5 rounded-full border justify-center",
         getSkillColor(level),
         className
       )}
     >
-      <Zap className="h-3 w-3" />
-      <span className="text-[10px] uppercase font-semibold tracking-wider">
-        {!short && "Nivel "}
-      </span>
-      <span className="font-semibold">
-        {showDecimals ? level.toFixed(1) : Math.round(level)}
+      <Zap className="h-[10px] w-[10px] shrink-0 mr-0.5" />
+      <span className="text-[10px] uppercase font-semibold tracking-wider flex items-center">
+        {!short && <span>Nivel</span>}
+        <span
+          className={cn(
+            "inline-block text-center",
+            showDecimals ? "w-4.5" : "w-3"
+          )}
+        >
+          {showDecimals ? level.toFixed(1) : Math.round(level)}
+        </span>
       </span>
     </span>
   );

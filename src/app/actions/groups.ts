@@ -142,3 +142,18 @@ export async function addPlayerToGroup(input: AddPlayerInput) {
   revalidatePath(`/groups/${input.groupId}`);
   return player;
 }
+
+export async function updateGroup(id: string, data: { name: string }) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    throw new Error("No autorizado");
+  }
+
+  const group = await prisma.group.update({
+    where: { id },
+    data: { name: data.name },
+  });
+
+  revalidatePath(`/groups/${id}`);
+  return group;
+}
