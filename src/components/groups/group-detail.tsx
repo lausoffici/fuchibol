@@ -212,7 +212,7 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                             </span>
                           </div>
                         </div>
-                        <div className="flex flex-col gap-4 p-4">
+                        <div className="flex flex-col gap-2 p-4">
                           <TeamCard
                             team="A"
                             players={match.teamAPlayers}
@@ -220,6 +220,11 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                             scoreDiff={match.scoreDiff}
                             mvp={match.mvp}
                           />
+                          <div className="flex items-center justify-center">
+                            <span className="text-xs font-medium text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-full">
+                              VS
+                            </span>
+                          </div>
                           <TeamCard
                             team="B"
                             players={match.teamBPlayers}
