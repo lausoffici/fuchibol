@@ -38,6 +38,8 @@ import { EditGroupDialog } from "./edit-group-dialog";
 import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/lib/utils";
 import { WinnerBadge, LoserBadge, MvpBadge } from "../badges";
+import { InviteButton } from "@/components/groups/invite-button";
+import { useSession } from "next-auth/react";
 
 function getPlayerStats(group: GroupWithDetails) {
   const stats = group.players.map((player) => {
@@ -81,6 +83,10 @@ function getPlayerStats(group: GroupWithDetails) {
 }
 
 export function GroupDetail({ group }: { group: GroupWithDetails }) {
+  const { data: session } = useSession();
+
+  const isOwner = session?.user?.email === group.owner.email;
+
   const [matchDialogOpen, setMatchDialogOpen] = useState(false);
   const [playerDialogOpen, setPlayerDialogOpen] = useState(false);
   const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
@@ -112,14 +118,16 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold tracking-tight">{group.name}</h1>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setEditGroupOpen(true)}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
+            {isOwner && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setEditGroupOpen(true)}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            )}
           </div>
           {group.matches?.[0] && (
             <div className="text-sm text-muted-foreground flex items-center gap-1.5 mt-2">
@@ -165,24 +173,27 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
               </div>
             )}
           </div>
-          <div className="flex gap-3">
-            <Button
-              variant="default"
-              onClick={() => setMatchDialogOpen(true)}
-              className="flex-1"
-            >
-              <Swords className="h-4 w-4 mr-2" />
-              Registrar partido
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setPlayerDialogOpen(true)}
-              className="flex-1"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar jugadores
-            </Button>
-          </div>
+          {isOwner && (
+            <div className="flex gap-3">
+              <Button
+                variant="default"
+                onClick={() => setMatchDialogOpen(true)}
+                className="flex-1"
+              >
+                <Swords className="h-4 w-4 mr-2" />
+                Registrar partido
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setPlayerDialogOpen(true)}
+                className="flex-1"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Agregar jugadores
+              </Button>
+              <InviteButton groupId={group.id} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -233,35 +244,37 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                             mvp={match.mvp}
                           />
                         </div>
-                        <div className="absolute right-2 top-2">
-                          <DropdownMenu modal={false}>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 hover:bg-muted/50 flex items-center justify-center"
-                              >
-                                <MoreVertical className="h-4 w-4 text-muted-foreground" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => setEditMatch(match)}
-                                className="group flex items-center gap-2 text-sm font-medium hover:bg-muted/50 focus:bg-muted/50"
-                              >
-                                <Edit className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                                Editar partido
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() => setDeleteMatchId(match.id)}
-                                className="group flex items-center gap-2 text-sm font-medium text-destructive/80 hover:text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
-                              >
-                                <Trash2 className="h-4 w-4 text-destructive/70 group-hover:text-destructive transition-colors" />
-                                Eliminar partido
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
+                        {isOwner && (
+                          <div className="absolute right-2 top-2">
+                            <DropdownMenu modal={false}>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 hover:bg-muted/50 flex items-center justify-center"
+                                >
+                                  <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => setEditMatch(match)}
+                                  className="group flex items-center gap-2 text-sm font-medium hover:bg-muted/50 focus:bg-muted/50"
+                                >
+                                  <Edit className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                                  Editar partido
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => setDeleteMatchId(match.id)}
+                                  className="group flex items-center gap-2 text-sm font-medium text-destructive/80 hover:text-destructive hover:bg-destructive/10 focus:bg-destructive/10"
+                                >
+                                  <Trash2 className="h-4 w-4 text-destructive/70 group-hover:text-destructive transition-colors" />
+                                  Eliminar partido
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        )}
                       </div>
                     </Card>
                   ))}
@@ -523,35 +536,39 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
         </div>
       </div>
 
-      <AddPlayerDialog
-        groupId={group.id}
-        open={playerDialogOpen}
-        onOpenChange={setPlayerDialogOpen}
-      />
-      <CreateMatchDialog
-        groupId={group.id}
-        players={group.players}
-        open={matchDialogOpen}
-        onOpenChange={setMatchDialogOpen}
-      />
-      <DeleteMatchAlert
-        matchId={deleteMatchId!}
-        groupId={group.id}
-        open={deleteMatchId !== null}
-        onOpenChange={(open) => !open && setDeleteMatchId(null)}
-      />
-      <EditMatchDialog
-        match={editMatch!}
-        players={group.players}
-        open={editMatch !== null}
-        onOpenChange={(open) => !open && setEditMatch(null)}
-      />
-      <EditGroupDialog
-        groupId={group.id}
-        currentName={group.name}
-        open={editGroupOpen}
-        onOpenChange={setEditGroupOpen}
-      />
+      {isOwner && (
+        <>
+          <AddPlayerDialog
+            groupId={group.id}
+            open={playerDialogOpen}
+            onOpenChange={setPlayerDialogOpen}
+          />
+          <CreateMatchDialog
+            groupId={group.id}
+            players={group.players}
+            open={matchDialogOpen}
+            onOpenChange={setMatchDialogOpen}
+          />
+          <DeleteMatchAlert
+            matchId={deleteMatchId!}
+            groupId={group.id}
+            open={deleteMatchId !== null}
+            onOpenChange={(open) => !open && setDeleteMatchId(null)}
+          />
+          <EditMatchDialog
+            match={editMatch!}
+            players={group.players}
+            open={editMatch !== null}
+            onOpenChange={(open) => !open && setEditMatch(null)}
+          />
+          <EditGroupDialog
+            groupId={group.id}
+            currentName={group.name}
+            open={editGroupOpen}
+            onOpenChange={setEditGroupOpen}
+          />
+        </>
+      )}
     </div>
   );
 }

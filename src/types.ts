@@ -1,4 +1,4 @@
-import { Group, Player, Match } from "@prisma/client";
+import { Group, Player, Match, User } from "@prisma/client";
 
 export type Params<T extends object = object> = Promise<T>;
 
@@ -17,4 +17,5 @@ export type GroupWithDetails = Group & {
     players: number;
     matches: number;
   };
+  owner: User;
 };

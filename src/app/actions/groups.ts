@@ -58,8 +58,22 @@ export async function getUserGroups() {
   const user = await prisma.user.findUnique({
     where: { email: session.user.email },
     include: {
+      // Get groups where user is owner
       ownGroups: {
         include: {
+          owner: true,
+          players: true,
+          _count: {
+            select: {
+              players: true,
+            },
+          },
+        },
+      },
+      // Get groups where user is member
+      groups: {
+        include: {
+          owner: true,
           players: true,
           _count: {
             select: {
@@ -71,9 +85,15 @@ export async function getUserGroups() {
     },
   });
 
-  // Obtener los matches en una consulta separada
-  const groups = await Promise.all(
-    (user?.ownGroups ?? []).map(async (group) => {
+  // Merge owned and member groups removing duplicates using group ID
+  const allGroups = [...(user?.ownGroups ?? []), ...(user?.groups ?? [])];
+  const uniqueGroups = Array.from(
+    new Map(allGroups.map((group) => [group.id, group])).values()
+  );
+
+  // Get match count for each unique group
+  const groupsWithMatches = await Promise.all(
+    uniqueGroups.map(async (group) => {
       const matchCount = await prisma.match.count({
         where: { groupId: group.id },
       });
@@ -88,13 +108,14 @@ export async function getUserGroups() {
     })
   );
 
-  return groups;
+  return groupsWithMatches;
 }
 
 export async function getGroup(id: string) {
   const group = await prisma.group.findUnique({
     where: { id },
     include: {
+      owner: true,
       players: true,
       matches: {
         include: {

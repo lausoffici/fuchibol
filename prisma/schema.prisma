@@ -19,15 +19,16 @@ model User {
 }
 
 model Group {
-    id        String   @id @default(cuid())
-    name      String
-    ownerId   String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    owner     User     @relation(fields: [ownerId], references: [id])
-    matches   Match[]
-    players   Player[]
-    members   User[]   @relation("GroupMembers")
+    id          String       @id @default(cuid())
+    name        String
+    ownerId     String
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    owner       User         @relation(fields: [ownerId], references: [id])
+    matches     Match[]
+    players     Player[]
+    members     User[]       @relation("GroupMembers")
+    invitations Invitation[]
 }
 
 model Player {
@@ -56,4 +57,14 @@ model Match {
     mvp          Player?  @relation("MVP", fields: [mvpId], references: [id])
     teamAPlayers Player[] @relation("TeamAPlayers")
     teamBPlayers Player[] @relation("TeamBPlayers")
+}
+
+model Invitation {
+    id        String   @id @default(cuid())
+    token     String   @unique
+    groupId   String
+    createdAt DateTime @default(now())
+    group     Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    @@index([token])
 }
