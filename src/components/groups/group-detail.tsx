@@ -114,6 +114,12 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
 
   return (
     <div className="space-y-6">
+      {!isOwner && (
+        <div className="bg-muted/30 border rounded-lg px-4 py-3 text-sm text-muted-foreground flex items-center gap-2">
+          <Users className="h-4 w-4" />
+          <span>Estás viendo este grupo como invitado</span>
+        </div>
+      )}
       <div className="pb-6 border-b space-y-6">
         <div>
           <div className="flex items-center gap-2">
@@ -129,21 +135,27 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
               </Button>
             )}
           </div>
-          {group.matches?.[0] && (
-            <div className="text-sm text-muted-foreground flex items-center gap-1.5 mt-2">
-              <Clock className="h-3.5 w-3.5" />
-              <span>
-                {(() => {
-                  const days = getDaysAgo(new Date(group.matches[0].date));
-                  return `Último partido hace ${days} ${pluralize(
-                    days,
-                    "día",
-                    "días"
-                  )}`;
-                })()}
-              </span>
+          <div className="flex flex-col gap-2 mt-2">
+            <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+              <Users className="h-3.5 w-3.5" />
+              <span>Creado por {group.owner.name}</span>
             </div>
-          )}
+            {group.matches?.[0] && (
+              <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                <span>
+                  {(() => {
+                    const days = getDaysAgo(new Date(group.matches[0].date));
+                    return `Último partido hace ${days} ${pluralize(
+                      days,
+                      "día",
+                      "días"
+                    )}`;
+                  })()}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="space-y-6">
