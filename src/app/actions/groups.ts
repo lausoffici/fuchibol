@@ -63,9 +63,17 @@ export async function getUserGroups() {
         include: {
           owner: true,
           players: true,
+          matches: {
+            include: {
+              teamAPlayers: true,
+              teamBPlayers: true,
+              mvp: true,
+            },
+          },
           _count: {
             select: {
               players: true,
+              matches: true,
             },
           },
         },
@@ -75,9 +83,17 @@ export async function getUserGroups() {
         include: {
           owner: true,
           players: true,
+          matches: {
+            include: {
+              teamAPlayers: true,
+              teamBPlayers: true,
+              mvp: true,
+            },
+          },
           _count: {
             select: {
               players: true,
+              matches: true,
             },
           },
         },
@@ -91,24 +107,7 @@ export async function getUserGroups() {
     new Map(allGroups.map((group) => [group.id, group])).values()
   );
 
-  // Get match count for each unique group
-  const groupsWithMatches = await Promise.all(
-    uniqueGroups.map(async (group) => {
-      const matchCount = await prisma.match.count({
-        where: { groupId: group.id },
-      });
-
-      return {
-        ...group,
-        _count: {
-          ...group._count,
-          matches: matchCount,
-        },
-      };
-    })
-  );
-
-  return groupsWithMatches;
+  return uniqueGroups;
 }
 
 export async function getGroup(id: string) {

@@ -7,28 +7,13 @@ import { pluralize, getGroupAverageSkill } from "@/lib/utils/format";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { GroupWithDetails } from "@/types";
 
-interface Player {
-  id: string;
-  name: string;
-  skill: number;
+interface GroupsListProps {
+  groups: GroupWithDetails[];
 }
 
-interface Group {
-  id: string;
-  name: string;
-  players: Player[];
-  owner: {
-    email: string;
-    name: string;
-  };
-  _count: {
-    players: number;
-    matches: number;
-  };
-}
-
-export function GroupsList({ groups }: { groups: Group[] }) {
+export function GroupsList({ groups }: GroupsListProps) {
   const { data: session } = useSession();
 
   return (

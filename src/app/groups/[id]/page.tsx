@@ -6,9 +6,15 @@ import { GroupDetail } from "@/components/groups/group-detail";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
-import { PageProps } from "@/types";
+import { PageProps } from "@/types/page";
 
-export default async function GroupPage({ params }: PageProps<{ id: string }>) {
+type GroupPageParams = {
+  id: string;
+};
+
+export default async function GroupPage({
+  params,
+}: PageProps<GroupPageParams>) {
   const session = await getServerSession(authOptions);
   const { id } = await params;
 

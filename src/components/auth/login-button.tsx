@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
 import { FaGoogle } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export function LoginButton() {
+function LoginButtonContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
 
@@ -23,5 +24,13 @@ export function LoginButton() {
       <FaGoogle className="mr-2" />
       Iniciar sesión con Google
     </Button>
+  );
+}
+
+export function LoginButton() {
+  return (
+    <Suspense>
+      <LoginButtonContent />
+    </Suspense>
   );
 }
