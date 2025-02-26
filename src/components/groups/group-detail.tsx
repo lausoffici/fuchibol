@@ -159,31 +159,34 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
         </div>
 
         <div className="space-y-6">
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30">
-              <Users className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="font-medium">
-                {group._count.players}{" "}
-                {pluralize(group._count.players, "jugador", "jugadores")}
-              </span>
-            </div>
-
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30">
-              <Swords className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="font-medium">
-                {group._count.matches}{" "}
-                {pluralize(group._count.matches, "partido", "partidos")}
-              </span>
-            </div>
-
-            {getGroupAverageSkill(group.players) > 0 && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30 shrink-0">
-                <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30">
+                <Users className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="font-medium">
-                  Nivel {getGroupAverageSkill(group.players).toFixed(1)}
+                  {group._count.players}{" "}
+                  {pluralize(group._count.players, "jugador", "jugadores")}
                 </span>
               </div>
-            )}
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30">
+                <Swords className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="font-medium">
+                  {group._count.matches}{" "}
+                  {pluralize(group._count.matches, "partido", "partidos")}
+                </span>
+              </div>
+
+              {getGroupAverageSkill(group.players) > 0 && (
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/30 shrink-0">
+                  <Zap className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span className="font-medium">
+                    Nivel {getGroupAverageSkill(group.players).toFixed(1)}
+                  </span>
+                </div>
+              )}
+            </div>
+            {isOwner && <InviteButton groupId={group.id} />}
           </div>
           {isOwner && (
             <div className="flex gap-3">
@@ -203,7 +206,6 @@ export function GroupDetail({ group }: { group: GroupWithDetails }) {
                 <Plus className="h-4 w-4 mr-2" />
                 Agregar jugadores
               </Button>
-              <InviteButton groupId={group.id} />
             </div>
           )}
         </div>
