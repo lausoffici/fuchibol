@@ -3,7 +3,8 @@ import { Group, Player, Match, User } from "@prisma/client";
 export type Params<T extends object = object> = Promise<T>;
 
 export type PageProps<T extends object = object> = {
-  params: Params<T>;
+  params: T;
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
 export type GroupWithDetails = Group & {

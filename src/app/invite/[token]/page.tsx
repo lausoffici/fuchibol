@@ -2,34 +2,26 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
 import { getGroupByInviteToken, joinGroup } from "@/app/actions/invitations";
+import { PageProps } from "@/types";
 
-interface InvitationPageProps {
-  params: {
-    token: string;
-  };
-}
-
-export default async function InvitationPage({ params }: InvitationPageProps) {
+export default async function InvitationPage({
+  params,
+}: PageProps<{ token: string }>) {
   const session = await getServerSession(authOptions);
+  const { token } = params;
 
-  if (!session?.user?.email) {
-    const callbackUrl = `/invite/${params.token}`;
+  if (!session) {
+    const callbackUrl = `/invite/${token}`;
     redirect(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   }
 
-  try {
-    const result = await getGroupByInviteToken(params.token);
-    if (!result?.success || !result.group) {
-      throw new Error("Invalid invitation token");
-    }
+  const group = await getGroupByInviteToken(token);
 
-    const joinResult = await joinGroup(result.group.id);
-    if (!joinResult.success) {
-      throw new Error("Failed to join group");
-    }
-  } catch {
+  if (!group) {
     redirect("/");
   }
+
+  await joinGroup(token);
 
   redirect("/");
 }
